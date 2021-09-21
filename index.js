@@ -1,7 +1,7 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoiMjA0MjI3MyIsImEiOiJja21zMmdsbW8wZHRkMndzMWRtNW55NWowIn0.cuMJNvU1uR_Tth7Aul-uMQ';
 
  function myFunction() {
-  location.replace("C:\MyMapApp_v4\\newLocation.html")
+  location.replace("https://github.com/sowjanyaksj/MyMapApp/blob/main/newLocation.html")
 }
       
     let succeed = function(position) {
