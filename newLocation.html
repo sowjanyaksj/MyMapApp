@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Save Web Form Data to Spreadsheets - Contact Form</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+<script src="https://api.tiles.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
+<link
+  href="https://api.tiles.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css"
+  rel="stylesheet"
+/>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css"
+  type="text/css"
+/>
+<script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+function SubForm (){
+    $.ajax({
+        url:"https://api.apispreadsheets.com/data/16127/",
+        type:'post',
+        data:$("#myForm,#myForm2").serializeArray(),
+        success: function(){
+          alert("Form Data Submitted :)")
+        },
+        error: function(){
+          alert("There was an error :(")
+        }
+    });
+}
+function GoBack (){
+	location.replace("C:\MyMapApp_v4\\index.html")
+}
+</script>
+ <style>
+      #map {
+        position: absolute;
+		margin: 110px;
+        top: 0%;
+        bottom: 15%;
+        width: 80%;		
+      }  
+	  #myForm {
+        position: relative;
+		top: 0%;
+        bottom: 0%;		
+      } 
+	  #myForm2 {
+        position: absolute;
+		top: 65%;
+        bottom: 0%;		
+      }
+	  #submit {
+	  position: absolute;
+		top : 90%;
+	  }
+	  #goback {
+	  position: relative;
+		top : 0%;
+	  }
+	  
+ </style>
+</head>
+<body>
+  <button onclick="GoBack()" id="goback">GO Back</button>
+  <form id="myForm">
+    <label>Location Name</label>
+    <br/>
+	<input name="location" />
+	<br/>
+</form>
+<form id="myForm1">
+    
+    <br/>
+	 <label>Select location</label>
+    <br/>
+		<div id="map"></div>
+	<br/>
+	 </form>
+<form id="myForm2">
+	
+    <label>Address</label>
+    <br/>
+    <input name="address" id="address"/>
+    <br/>
+    <label>Opening times</label>
+    <br/>
+    <input type="radio" id="times" name="times" value="9am - 5pm" /> 9am - 5pm<br/>
+    <input type="radio" id="times" name="times" value="24 hours" /> 24 hours<br/>
+    <br/>
+	  <input name="lng" id="lng" type="hidden"/>
+	  <input name="lat" id="lat" type="hidden"/>
+    <br/>
+  </form>
+  <script>        
+      mapboxgl.accessToken = 'pk.eyJ1IjoiMjA0MjI3MyIsImEiOiJja21zMmdsbW8wZHRkMndzMWRtNW55NWowIn0.cuMJNvU1uR_Tth7Aul-uMQ';
+      
+    let succeed = function(position) {
+      var map = new mapboxgl.Map({
+        container: 'map', // Container ID
+        style: 'mapbox://styles/mapbox/streets-v11', // Map style to use
+        center: [position.coords.longitude, position.coords.latitude], // Starting position [lng, lat]
+        zoom: 12 // Starting zoom level
+      });
+	  
+	 map.on('click', function(e) {
+		console.log('A click event has occurred on a visible portion of the poi-label layer at ' + e.lngLat);
+		var elnglat = String(e.lngLat);
+		var sString = elnglat.substring(6);
+		var myArr = sString.split(",");
+		var lng = myArr[0].split("(")[1];
+		var lat = myArr[1].split(")")[0];
+		var coords = "["+lng+","+lat+"]";
+		document.getElementById("lng").value = lng;
+		document.getElementById("lat").value = lat;
+	  })
+	};
+  navigator.geolocation.getCurrentPosition(succeed,console.log); 
+	 
+  </script>
+  <button onclick="SubForm()" id="submit">Submit</button>
+
+ 
+</body>
+</html>
