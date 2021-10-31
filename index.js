@@ -176,9 +176,9 @@ let succeed = function(position) {
 
                 var lng = json.data[i].lng;
                 var lat = json.data[i].lat;
-                var marker2 = new mapboxgl.Marker() // Initialize a new marker
+             /*    var marker2 = new mapboxgl.Marker() // Initialize a new marker
                     .setLngLat([lng, lat]) // Marker [lng, lat] coordinates
-                    .addTo(map); // Add the marker to the map
+                    .addTo(map); // Add the marker to the map */
             }
             console.log("what is happening here");
             /* var data = json.routes[0];
