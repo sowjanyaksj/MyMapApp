@@ -122,6 +122,66 @@ let succeed = function(position) {
             }
         };
         req.send();
+		
+		var url = 'https://api.mapbox.com/directions/v5/mapbox/driving/' + start[0] + ',' + start[1] + ';' + end[0] + ',' + end[1] + '?steps=true&geometries=geojson&access_token=' + mapboxgl.accessToken;
+        console.log(url);
+        // make an XHR request https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+        var req = new XMLHttpRequest();
+        req.open('GET', url, true);
+        req.onload = function() {
+            var json = JSON.parse(req.response);
+            var data = json.routes[0];
+            var route = data.geometry.coordinates;
+            var geojson = {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                    type: 'LineString',
+                    coordinates: route
+                }
+            };
+            // if the route already exists on the map, reset it using setData
+            if (map.getSource('route')) {
+                map.getSource('route').setData(geojson);
+            } else { // otherwise, make a new request
+                map.addLayer({
+                    id: 'route',
+                    type: 'line',
+                    source: {
+                        type: 'geojson',
+                        data: {
+                            type: 'Feature',
+                            properties: {},
+                            geometry: {
+                                type: 'LineString',
+                                coordinates: geojson
+                            }
+                        }
+                    },
+                    layout: {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    paint: {
+                        'line-color': '#3887be',
+                        'line-width': 5,
+                        'line-opacity': 0.75
+                    }
+                });
+            }
+            // add turn instructions here at the end
+            // get the sidebar and add the instructions
+            var instructions = document.getElementById('instructions');
+            var steps = data.legs[0].steps;
+
+            var tripInstructions = [];
+            for (var i = 0; i < steps.length; i++) {
+                tripInstructions.push('<br><li>' + steps[i].maneuver.instruction) + '</li>';
+                instructions.innerHTML = '<br><span class="duration">Trip duration: ' + Math.floor(data.duration / 60) + ' min 🚴 </span>' + tripInstructions;
+            }
+        };
+        req.send();
+		
     }
 
 
