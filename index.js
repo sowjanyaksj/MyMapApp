@@ -150,72 +150,7 @@ let succeed = function(position) {
                 };
                 req.send();
 
-                var url2 = 'https://api.mapbox.com/directions/v5/mapbox/driving/' + start[0] + ',' + start[1] + ';' + end[0] + ',' + end[1] + '?steps=true&geometries=geojson&access_token=' + mapboxgl.accessToken;
-                console.log(url);
-                // make an XHR request https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-                var req2 = new XMLHttpRequest();
-                req2.open('GET', url2, true);
-                req2.onload = function() {
-                    var json = JSON.parse(req2.response);
-                    var data = json.routes[0];
-                    var route = data.geometry.coordinates;
-                    var geojson = {
-                        type: 'Feature',
-                        properties: {},
-                        geometry: {
-                            type: 'LineString',
-                            coordinates: route
-                        }
-                    };
-                    // if the route already exists on the map, reset it using setData
-                    if (map.getSource('route')) {
-                        map.getSource('route').setData(geojson);
-                    } else { // otherwise, make a new request
-                        map.addLayer({
-                            id: 'route',
-                            type: 'line',
-                            source: {
-                                type: 'geojson',
-                                data: {
-                                    type: 'Feature',
-                                    properties: {},
-                                    geometry: {
-                                        type: 'LineString',
-                                        coordinates: geojson
-                                    }
-                                }
-                            },
-                            layout: {
-                                'line-join': 'round',
-                                'line-cap': 'round'
-                            },
-                            paint: {
-                                'line-color': '#3887be',
-                                'line-width': 5,
-                                'line-opacity': 0.75
-                            }
-                        });
-                    }
-                    // add turn instructions here at the end
-                    // get the sidebar and add the instructions
-                    //var instructions = document.getElementById('instructions');
-                    var steps = data.legs[0].steps;
-                    //var html_to_insert = "<p>New paragraph</p>";
-
-                    var tripInstructions2 = [];
-                    for (var i = 0; i < steps.length; i++) {
-                        tripInstructions2.push('<br> <li > ' + steps[i].maneuver.instruction) + ' < /li>';
-                        }
-                        var html_to_insert = '<br><span class="duration">Trip duration: ' + Math.floor(data.duration / 60) + ' min </span>' + tripInstructions2;
-
-                        //instructions.insertAdjacentHTML('afterend', html_to_insert); this works
-                        instructions.insertAdjacentHTML('beforebegin', html_to_insert); //this works
-                        //instructions.insertAdjacentHTML('beforeend', html_to_insert);
-
-                        //instructions.innerHTML = '<br><span class="duration">Trip duration: ' + Math.floor(data.duration / 60) + ' min </span>' + tripInstructions2;
-                    };
-                    req2.send();
-                }
+	}
 
 
 
