@@ -84,13 +84,152 @@ let succeed = function(position) {
 
 
         // create a function to make a directions request
-        function getRoute(end) {
+        function getRouteWalking(end) {
+            // make a directions request using walking profile
+            // an arbitrary start will always be the same
+            // only the end or destination will change
+            var start = deviceLocation;
+
+            var url = 'https://api.mapbox.com/directions/v5/mapbox/walking/' + start[0] + ',' + start[1] + ';' + end[0] + ',' + end[1] + '?steps=true&geometries=geojson&access_token=' + mapboxgl.accessToken;
+            console.log(url);
+            // make an XHR request https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+            var req = new XMLHttpRequest();
+            req.open('GET', url, true);
+            req.onload = function() {
+                var json = JSON.parse(req.response);
+                var data = json.routes[0];
+                var route1 = data.geometry.coordinates;
+                var geojson = {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: route1
+                    }
+                };
+                // if the route1 already exists on the map, reset it using setData
+                if (map.getSource('route1')) {
+                    map.getSource('route1').setData(geojson);
+                } else { // otherwise, make a new request
+                    map.addLayer({
+                        id: 'route1',
+                        type: 'line',
+                        source: {
+                            type: 'geojson',
+                            data: {
+                                type: 'Feature',
+                                properties: {},
+                                geometry: {
+                                    type: 'LineString',
+                                    coordinates: geojson
+                                }
+                            }
+                        },
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': 'green',
+                            'line-width': 5,
+                            'line-opacity': 0.75
+                        }
+                    });
+                }
+                // add turn instructions here at the end
+                // get the sidebar and add the instructions
+                var instructions = document.getElementById('instructions');
+                var steps = data.legs[0].steps;
+
+                var tripInstructions = [];
+                for (var i = 0; i < steps.length; i++) {
+                    tripInstructions.push('<br> <li > ' + steps[i].maneuver.instruction) + ' < /li>';
+                }
+				instructions.innerHTML = '<br><span class="duration">Trip duration: ' + Math.floor(data.duration / 60) + ' min By <span style="color:green">Walking</span> </span>' + tripInstructions;
+            };
+            req.send();
+
+	}
+
+function getRouteCycling(end) {
             // make a directions request using cycling profile
             // an arbitrary start will always be the same
             // only the end or destination will change
             var start = deviceLocation;
 
             var url = 'https://api.mapbox.com/directions/v5/mapbox/cycling/' + start[0] + ',' + start[1] + ';' + end[0] + ',' + end[1] + '?steps=true&geometries=geojson&access_token=' + mapboxgl.accessToken;
+            console.log(url);
+            // make an XHR request https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+            var req = new XMLHttpRequest();
+            req.open('GET', url, true);
+            req.onload = function() {
+                var json = JSON.parse(req.response);
+                var data = json.routes[0];
+                var route2 = data.geometry.coordinates;
+                var geojson = {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: route2
+                    }
+                };
+                // if the route2 already exists on the map, reset it using setData
+                if (map.getSource('route2')) {
+                    map.getSource('route2').setData(geojson);
+                } else { // otherwise, make a new request
+                    map.addLayer({
+                        id: 'route2',
+                        type: 'line',
+                        source: {
+                            type: 'geojson',
+                            data: {
+                                type: 'Feature',
+                                properties: {},
+                                geometry: {
+                                    type: 'LineString',
+                                    coordinates: geojson
+                                }
+                            }
+                        },
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': 'olive',
+                            'line-width': 5,
+                            'line-opacity': 0.75
+                        }
+                    });
+                }
+                // add turn instructions here at the end
+                // get the sidebar and add the instructions
+                var instructions = document.getElementById('instructions');				
+                var steps = data.legs[0].steps;
+
+                var tripInstructions = [];
+                for (var i = 0; i < steps.length; i++) {
+                    tripInstructions.push('<br> <li > ' + steps[i].maneuver.instruction) + ' < /li>';
+                }
+               
+				var newcontent = document.createElement('div1');
+                        newcontent.innerHTML = '<br><span class="duration">Trip duration: ' + Math.floor(data.duration / 60) + ' min by <span style="color:olive">Cycling</span></span>' + tripInstructions;
+				while (newcontent.firstChild) {
+					instructions.appendChild(newcontent.firstChild);
+				}
+			};
+            req.send();
+
+	}
+
+function getRouteDriving(end) {
+            // make a directions request using cycling profile
+            // an arbitrary start will always be the same
+            // only the end or destination will change
+            var start = deviceLocation;
+
+            var url = 'https://api.mapbox.com/directions/v5/mapbox/driving/' + start[0] + ',' + start[1] + ';' + end[0] + ',' + end[1] + '?steps=true&geometries=geojson&access_token=' + mapboxgl.accessToken;
             console.log(url);
             // make an XHR request https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
             var req = new XMLHttpRequest();
@@ -130,7 +269,7 @@ let succeed = function(position) {
                             'line-cap': 'round'
                         },
                         paint: {
-                            'line-color': '#3887be',
+                            'line-color': 'fuchsia',
                             'line-width': 5,
                             'line-opacity': 0.75
                         }
@@ -138,20 +277,23 @@ let succeed = function(position) {
                 }
                 // add turn instructions here at the end
                 // get the sidebar and add the instructions
-                var instructions = document.getElementById('instructions');
+                var instructions = document.getElementById('instructions');				
                 var steps = data.legs[0].steps;
 
                 var tripInstructions = [];
                 for (var i = 0; i < steps.length; i++) {
                     tripInstructions.push('<br> <li > ' + steps[i].maneuver.instruction) + ' < /li>';
-                        instructions.innerHTML = '<br><span class="duration">Trip duration: ' + Math.floor(data.duration / 60) + ' min 🚴 </span>' + tripInstructions;
-
-                    }
-                };
-                req.send();
+                }
+               				
+				var newcontent = document.createElement('div2');
+                        newcontent.innerHTML = '<br><span class="duration">Trip duration: ' + Math.floor(data.duration / 60) + ' min by <span style="color:fuchsia">Driving</span></span>' + tripInstructions;
+				while (newcontent.firstChild) {
+					instructions.appendChild(newcontent.firstChild);
+				}
+			};
+            req.send();
 
 	}
-
 
 
 		function forwardGeocoder(query) {
@@ -182,8 +324,7 @@ let succeed = function(position) {
 			// make a directions request using cycling profile
 			// an arbitrary start will always be the same
 			// only the end or destination will change
-			//var start = deviceLocation;
-
+			
 			var url = 'https://api.apispreadsheets.com/data/16127/';
 			console.log(url);
 			// make an XHR request https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
@@ -192,57 +333,18 @@ let succeed = function(position) {
 			request.onload = function() {
 				var json = JSON.parse(request.response);
 
-				//console.log(location);
-
-				/* var geojson = {
-				type: 'Feature',
-				properties: {},
-				geometry: {
-				type: 'Point',
-				coordinates: [lng, lat]
-				}
-				}; */
-				//console.log(geojson);
-				/* map.addSource('location',{
-				type: 'Feature',
-				properties: {},
-				geometry: {
-				type: 'Point',
-				coordinates: [lng, lat]
-				}
-				});
-
-				map.addLayer({
-				id: 'newLocation',
-				type: 'circle',
-				source: 'location',
-				paint: {
-				'circle-radius': 100,
-				'circle-color': '#B42222'
-				}
-				}); */
-
-
-
 				for (var i = 0; i < json.data.length; i++) {
 					var lng = json.data[i].lng;
-					var lat = json.data[i].lat; /* var marker2=new mapboxgl.Marker() // Initialize a new marker .setLngLat([lng, lat]) // Marker [lng, lat] coordinates .addTo(map); // Add the marker to the map */
+					var lat = json.data[i].lat;
 				}
 				console.log("what is happening here");
-				/* var data=json.routes[0]; var route=data.geometry.coordinates; var geojson={ type: 'Feature' , properties: {}, geometry: { type: 'LineString' , coordinates: route } }; // if the route already exists on the map, reset it using setData if (map.getSource('route')) { map.getSource('route').setData(geojson); } else { // otherwise, make a new request map.addLayer({ id: 'route' , type: 'line' , source: { type: 'geojson' , data: { type: 'Feature' , properties: {}, geometry: { type: 'LineString' , coordinates: geojson } } }, layout: { 'line-join' : 'round' , 'line-cap' : 'round' }, paint: { 'line-color' : '#3887be' , 'line-width' : 5, 'line-opacity' : 0.75 } }); } // add turn instructions here at the end // get the sidebar and add the instructions var instructions=document.getElementById('instructions'); var steps=data.legs[0].steps; var tripInstructions=[]; for (var i=0; i < steps.length; i++) { tripInstructions.push('<br>
-						   <li>' + steps[i].maneuver.instruction) + '</li>';
-						   instructions.innerHTML = '<br><span class="duration">Trip duration: ' + Math.floor(data.duration / 60) + ' min 🚴 </span>' + tripInstructions;
-						   } */
 			};
 			request.send();
 		}
 
-
-
 		// After the map style has loaded on the page,
 		// add a source layer and default styling for a single point
 		map.on('load', function() {
-			//loadSheet();
 			map.addSource('single-point', {
 				'type': 'geojson',
 				'data': {
@@ -266,51 +368,16 @@ let succeed = function(position) {
 			geocoder.on('result', function(e) {
 				map.getSource('single-point').setData(e.result.geometry);
 				console.log(e.result.geometry);
-				//var coordsObj = e.lngLat;
-				//console.log(coordsObj);//getting undefined
-				// canvas.style.cursor = '';
-				// var coords = Object.keys(coordsObj).map(function(key) {
-				// return coordsObj[key];
-				// });
+				
 				var coords = [e.result.geometry.coordinates[0], e.result.geometry.coordinates[1]];
 				console.log(coords);
 				// make an initial directions request that
 				// starts and ends at the same location
 				console.log("after getting geocoding result");
-				getRoute(deviceLocation);
+				getRouteWalking(deviceLocation);
+				
 				console.log(deviceLocation);
-				// Add starting point to the map
-				// map.addLayer({
-				// id: 'device',
-				// type: 'circle',
-				// source: {
-				// type: 'geojson',
-				// data: {
-				// type: 'FeatureCollection',
-				// features: [{
-				// type: 'Feature',
-				// properties: {},
-				// geometry: {
-				// type: 'Point',
-				// coordinates: deviceLocation
-				// }
-				// }
-				// ]
-				// }
-				// },
-				// paint: {
-				// 'circle-radius': 10,
-				// 'circle-color': '#3887be'
-				// }
-				// });
-
-				// var coordsObj = e.lngLat;
-				// console.log(coordsObj);
-				// // canvas.style.cursor = '';
-				// // var coords = Object.keys(coordsObj).map(function(key) {
-				// // return coordsObj[key];
-				// // });
-				// var coords = [e.longitude,e.latitude]
+				
 				var end = {
 					type: 'FeatureCollection',
 					features: [{
@@ -348,7 +415,9 @@ let succeed = function(position) {
 						}
 					});
 				}
-				getRoute(coords);
+				getRouteWalking(coords);
+				getRouteCycling(coords);			
+				getRouteDriving(coords);
 
 			});
 
