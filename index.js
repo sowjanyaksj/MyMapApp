@@ -16,31 +16,53 @@ let succeed = function(position) {
             .setLngLat([position.coords.longitude, position.coords.latitude]) // Marker [lng, lat] coordinates
             .addTo(map); // Add the marker to the map
 
-        // Load custom data to supplement the search results.
-        const customData = {
-            'features': [{
-                    'type': 'Feature',
-                    'properties': {
-                        'title': 'Brunswick street'
-                    },
-                    'geometry': {
-                        'coordinates': [-3.95415699429142, 51.6141729222217],
-                        'type': 'Point'
-                    }
-                },
-                {
-                    'type': 'Feature',
-                    'properties': {
-                        'title': 'St James'
-                    },
-                    'geometry': {
-                        'coordinates': [-3.96056624274024, 51.6188000832027],
-                        'type': 'Point'
-                    }
-                }
-            ],
+
+		// create a function to make a directions request
+		/* function loadSheet(url, callback) {
+			// make a directions request using cycling profile
+			// an arbitrary start will always be the same
+			// only the end or destination will change
+			
+			// var url = 'https://api.apispreadsheets.com/data/16127/';
+			console.log(url);
+			// make an XHR request https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+			var request = new XMLHttpRequest();
+			request.open('GET', url, true);
+			request.onload = function() {
+				setTimeout(function() {
+				var json = JSON.parse(request.response);
+				var jsonFeatures = '[';
+				for (var i = 0; i < json.data.length; i++) {
+					var lng = json.data[i].lng;
+					var lat = json.data[i].lat;
+					var title = json.data[i].location;
+					var jsonFeature = '{ "type": "Feature", "properties":' + '{' + '"title": ' +'"' + title +'"'+ 
+									'},' + '"geometry": '+  '{'+ '"coordinates": [' + lng + ',' + lat + '],' + 
+                        '"type": "Point"' + '}' + '}';	
+					if (i ==0) 	
+						jsonFeatures = jsonFeatures + jsonFeature;
+					else
+						jsonFeatures = jsonFeatures + ','+jsonFeature;
+				}
+				jsonFeatures = jsonFeatures + ']';
+				return callback(jsonFeatures)
+				 }, 1000);
+				
+				console.log("what is happening here");
+			};
+			request.send();
+		} */
+		
+	/* 	loadSheet('https://api.apispreadsheets.com/data/16127/', function(response) {
+			console.log(response);
+			// Load custom data to supplement the search results.			
+		}); */
+		
+		const customData = {
+            'features': [{ "type": "Feature", "properties":{"title": "Brunswick street"},"geometry": {"coordinates": [-3.95415699429142,51.6141729222217],"type": "Point"}},{ "type": "Feature", "properties":{"title": "St James"},"geometry": {"coordinates": [-3.96056624274024,51.6188000832027],"type": "Point"}},{ "type": "Feature", "properties":{"title": "Tesco Uplands"},"geometry": {"coordinates": [-3.96726682760007,51.6179092653681],"type": "Point"}},{ "type": "Feature", "properties":{"title": "My Swansea Castle"},"geometry": {"coordinates": [-3.94110363974635,51.6203000753989],"type": "Point"}},{ "type": "Feature", "properties":{"title": "jersy castle"},"geometry": {"coordinates": [-3.89349854668674,51.6255665292029],"type": "Point"}},{ "type": "Feature", "properties":{"title": "fabina port"},"geometry": {"coordinates": [-3.91772649983204,51.6224931033815],"type": "Point"}},{ "type": "Feature", "properties":{"title": "st thomos"},"geometry": {"coordinates": [,],"type": "Point"}},{ "type": "Feature", "properties":{"title": "st thomos"},"geometry": {"coordinates": [,],"type": "Point"}},{ "type": "Feature", "properties":{"title": "my castle"},"geometry": {"coordinates": [,],"type": "Point"}}],
             'type': 'FeatureCollection'
         };
+
         var geocoder = new MapboxGeocoder({
             // Initialize the geocoder
             accessToken: mapboxgl.accessToken, // Set the access token
@@ -66,25 +88,40 @@ let succeed = function(position) {
             trackUserLocation: true
         }));
 
-
         // Add zoom and rotation controls to the map.
         map.addControl(new mapboxgl.NavigationControl());
-
-
 
         // initialize the map canvas to interact with later
         var canvas = map.getCanvasContainer();
 
-
         //Start of the user location
 
         var deviceLocation = [position.coords.longitude, position.coords.latitude];
+		
+		function forwardGeocoder(query) {
+			const matchingFeatures = [];
+			for (const feature of customData.features) {
+				// Handle queries with different capitalization
+				// than the source data by calling toLowerCase().
+				if (
+					feature.properties.title
+					.toLowerCase()
+					.includes(query.toLowerCase())
+				) {
+					// Add a tree emoji as a prefix for custom
+					// data results using carmen geojson format:
+					// https://github.com/mapbox/carmen/blob/master/carmen-geojson.md
+					feature['place_name'] = `🌲 ${feature.properties.title}`;
+					feature['center'] = feature.geometry.coordinates;
+					feature['place_type'] = ['park'];
+					matchingFeatures.push(feature);
+				}
+			}
+			return matchingFeatures;
+		}
 
-        loadSheet();
-
-
-        // create a function to make a directions request
-        function getRouteWalking(end) {
+		// create a function to make a directions request
+		function getRouteWalking(end) {
             // make a directions request using walking profile
             // an arbitrary start will always be the same
             // only the end or destination will change
@@ -149,9 +186,9 @@ let succeed = function(position) {
             };
             req.send();
 
-	}
+		}
 
-function getRouteCycling(end) {
+		function getRouteCycling(end) {
             // make a directions request using cycling profile
             // an arbitrary start will always be the same
             // only the end or destination will change
@@ -221,9 +258,9 @@ function getRouteCycling(end) {
 			};
             req.send();
 
-	}
+		}
 
-function getRouteDriving(end) {
+		function getRouteDriving(end) {
             // make a directions request using cycling profile
             // an arbitrary start will always be the same
             // only the end or destination will change
@@ -293,54 +330,8 @@ function getRouteDriving(end) {
 			};
             req.send();
 
-	}
-
-
-		function forwardGeocoder(query) {
-			const matchingFeatures = [];
-			for (const feature of customData.features) {
-				// Handle queries with different capitalization
-				// than the source data by calling toLowerCase().
-				if (
-					feature.properties.title
-					.toLowerCase()
-					.includes(query.toLowerCase())
-				) {
-					// Add a tree emoji as a prefix for custom
-					// data results using carmen geojson format:
-					// https://github.com/mapbox/carmen/blob/master/carmen-geojson.md
-					feature['place_name'] = `🌲 ${feature.properties.title}`;
-					feature['center'] = feature.geometry.coordinates;
-					feature['place_type'] = ['park'];
-					matchingFeatures.push(feature);
-				}
-			}
-			return matchingFeatures;
 		}
 
-
-		// create a function to make a directions request
-		function loadSheet() {
-			// make a directions request using cycling profile
-			// an arbitrary start will always be the same
-			// only the end or destination will change
-			
-			var url = 'https://api.apispreadsheets.com/data/16127/';
-			console.log(url);
-			// make an XHR request https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
-			var request = new XMLHttpRequest();
-			request.open('GET', url, true);
-			request.onload = function() {
-				var json = JSON.parse(request.response);
-
-				for (var i = 0; i < json.data.length; i++) {
-					var lng = json.data[i].lng;
-					var lat = json.data[i].lat;
-				}
-				console.log("what is happening here");
-			};
-			request.send();
-		}
 
 		// After the map style has loaded on the page,
 		// add a source layer and default styling for a single point
@@ -422,7 +413,6 @@ function getRouteDriving(end) {
 			});
 
 		});
-
 
 		map.on('click', function(e) {
 			console.log('A click event has occurred on a visible portion of the poi-label layer at ' + e.lngLat);
