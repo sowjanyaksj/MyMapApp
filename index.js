@@ -6,12 +6,8 @@ function myFunction() {
 
 let succeed = function(position) {
 
-		// create a function to make a directions request
+		// Function to load spredsheet crowdsourced data to supplement the search results
 		function loadSheet(url, callback) {
-			// make a directions request using cycling profile
-			// an arbitrary start will always be the same
-			// only the end or destination will change
-			
 			// var url = 'https://api.apispreadsheets.com/data/16127/';
 			console.log(url);
 			// make an XHR request https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
@@ -58,10 +54,9 @@ let succeed = function(position) {
 			var marker = new mapboxgl.Marker() // Initialize a new marker
 				.setLngLat([position.coords.longitude, position.coords.latitude]) // Marker [lng, lat] coordinates
 				.addTo(map); // Add the marker to the map
-				// Load custom data to supplement the search results.			
+				// Load new locations data to supplement the search results.			
 					
 			const customData = {
-				//'features': [{ "type": "Feature", "properties":{"title": "Brunswick street"},"geometry": {"coordinates": [-3.95415699429142,51.6141729222217],"type": "Point"}},{ "type": "Feature", "properties":{"title": "St James"},"geometry": {"coordinates": [-3.96056624274024,51.6188000832027],"type": "Point"}},{ "type": "Feature", "properties":{"title": "Tesco Uplands"},"geometry": {"coordinates": [-3.96726682760007,51.6179092653681],"type": "Point"}},{ "type": "Feature", "properties":{"title": "My Swansea Castle"},"geometry": {"coordinates": [-3.94110363974635,51.6203000753989],"type": "Point"}},{ "type": "Feature", "properties":{"title": "jersy castle"},"geometry": {"coordinates": [-3.89349854668674,51.6255665292029],"type": "Point"}},{ "type": "Feature", "properties":{"title": "fabina port"},"geometry": {"coordinates": [-3.91772649983204,51.6224931033815],"type": "Point"}},{ "type": "Feature", "properties":{"title": "st thomos"},"geometry": {"coordinates": [,],"type": "Point"}},{ "type": "Feature", "properties":{"title": "st thomos"},"geometry": {"coordinates": [,],"type": "Point"}},{ "type": "Feature", "properties":{"title": "my castle"},"geometry": {"coordinates": [,],"type": "Point"}}],
 				//'features': [{ "type": "Feature", "properties":{"title": "Brunswick street"},"geometry": {"coordinates": [-3.95415699429142,51.6141729222217],"type": "Point"}},{ "type": "Feature", "properties":{"title": "St James"},"geometry": {"coordinates": [-3.96056624274024,51.6188000832027],"type": "Point"}},{ "type": "Feature", "properties":{"title": "Tesco Uplands"},"geometry": {"coordinates": [-3.96726682760007,51.6179092653681],"type": "Point"}},{ "type": "Feature", "properties":{"title": "My Swansea Castle"},"geometry": {"coordinates": [-3.94110363974635,51.6203000753989],"type": "Point"}},{ "type": "Feature", "properties":{"title": "jersy castle"},"geometry": {"coordinates": [-3.89349854668674,51.6255665292029],"type": "Point"}},{ "type": "Feature", "properties":{"title": "fabina port"},"geometry": {"coordinates": [-3.91772649983204,51.6224931033815],"type": "Point"}},{ "type": "Feature", "properties":{"title": "st thomos"},"geometry": {"coordinates": [,],"type": "Point"}},{ "type": "Feature", "properties":{"title": "st thomos"},"geometry": {"coordinates": [,],"type": "Point"}},{ "type": "Feature", "properties":{"title": "my castle"},"geometry": {"coordinates": [,],"type": "Point"}}],
 				'features': JSON.parse(response),
 				'type': 'FeatureCollection'
