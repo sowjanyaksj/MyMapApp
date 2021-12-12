@@ -16,18 +16,19 @@ let succeed = function(position) {
 			request.onload = function() {
 				setTimeout(function() {
 				var json = JSON.parse(request.response);
+				console.log(json);
 				var jsonFeatures = '[';
 				for (var i = 0; i < json.data.length; i++) {
 					var lng = json.data[i].lng;
 					var lat = json.data[i].lat;
-					var title = json.data[i].location;
-					var jsonFeature = '{ "type": "Feature", "properties":' + '{' + '"title": ' +'"' + title +'"'+ 
+					var address = json.data[i].location;
+					var opening_times = json.data[i].opening_times;
+					var waiting_time = json.data[i].waiting_time;
+					var category = json.data[i].category;
+					var jsonFeature = '{ "type": "Feature", "properties":' + '{' + '"address": ' +'"' + address +'"' + ','+ '"category": ' +'"' + category +'"' + ',' + '"opening_times": ' +'"' + opening_times +'"' + ',' + '"waiting_time": ' +'"' + waiting_time +'"'+ 
 									'},' + '"geometry": '+  '{'+ '"coordinates": [' + lng + ',' + lat + '],' + 
                         '"type": "Point"' + '}' + '}';	
-						
-					/* var jsonFeature = '{' +  'type' +':'+ 'Feature' +',' + 'properties'+ ':' + '{' + ''title': ' +''' + title +'''+ 
-									'},' + ''geometry': '+  '{'+ ''coordinates': [' + lng + ',' + lat + '],' + 
-                        ''type': 'Point'' + '}' + '}'; */
+					
 					if (i ==0) 	
 						jsonFeatures = jsonFeatures + jsonFeature;
 					else
@@ -104,14 +105,14 @@ let succeed = function(position) {
 					// Handle queries with different capitalization
 					// than the source data by calling toLowerCase().
 					if (
-						feature.properties.title
+						feature.properties.address
 						.toLowerCase()
 						.includes(query.toLowerCase())
 					) {
 						// Add a tree emoji as a prefix for custom
 						// data results using carmen geojson format:
 						// https://github.com/mapbox/carmen/blob/master/carmen-geojson.md
-						feature['place_name'] = `🌲 ${feature.properties.title}`;
+						feature['place_name'] = `🌲 ${feature.properties.address}`;
 						feature['center'] = feature.geometry.coordinates;
 						feature['place_type'] = ['park'];
 						matchingFeatures.push(feature);
@@ -358,7 +359,7 @@ let succeed = function(position) {
 				// Add a marker at the result's coordinates
 				geocoder.on('result', function(e) {
 					map.getSource('single-point').setData(e.result.geometry);
-					console.log(e.result.geometry);
+					console.log(e.result);
 					
 					var coords = [e.result.geometry.coordinates[0], e.result.geometry.coordinates[1]];
 					console.log(coords);
@@ -373,7 +374,12 @@ let succeed = function(position) {
 						type: 'FeatureCollection',
 						features: [{
 							type: 'Feature',
-							properties: {},
+							properties: {
+								address: e.result.properties.address,
+								category: e.result.properties.category,
+								opening_times: e.result.properties.opening_times,
+								waiting_time: e.result.properties.waiting_time
+							},
 							geometry: {
 								type: 'Point',
 								coordinates: coords
@@ -392,7 +398,12 @@ let succeed = function(position) {
 									type: 'FeatureCollection',
 									features: [{
 										type: 'Feature',
-										properties: {},
+										properties: {
+											address: e.result.properties.address,
+											category: e.result.properties.category,
+											opening_times: e.result.properties.opening_times,
+											waiting_time: e.result.properties.waiting_time
+										},
 										geometry: {
 											type: 'Point',
 											coordinates: coords
@@ -412,11 +423,45 @@ let succeed = function(position) {
 
 				});
 
+				// When a click event occurs on a feature in the end layer, open a popup at the
+				// location of the feature, with description HTML from its properties.
+				map.on('click', 'end', (e) => {
+					// Copy coordinates array.
+					var coordinates = e.features[0].geometry.coordinates.slice();
+					const waiting_time = e.features[0].properties.waiting_time;
+					const opening_times = e.features[0].properties.opening_times;
+					const address = e.features[0].properties.address;
+					const category = e.features[0].properties.category;
+					var description = `<h3>` + e.features[0].properties.address + `</h3>` + `<h4>` + `<b>` + `Category: ` + `</b>` + e.features[0].properties.category + `</h4>`+ `<h4>` + `<b>` + `Opening Times: ` + `</b>` + e.features[0].properties.opening_times + `</h4>` + `<h4>` + `<b>` + `Waiting Time: ` + `</b>` + e.features[0].properties.waiting_time + `</h4>`;
+
+					// Ensure that if the map is zoomed out such that multiple
+					// copies of the feature are visible, the popup appears
+					// over the copy being pointed to.
+					while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+						coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+					}
+					console.log(customData);
+					new mapboxgl.Popup()
+						.setLngLat(coordinates)
+						.setHTML(description)
+						.addTo(map);
+				});
+
+				// Change the cursor to a pointer when the mouse is over the end layer.
+				map.on('mouseenter', 'end', () => {
+					map.getCanvas().style.cursor = 'pointer';
+				});
+
+				// Change it back to a pointer when it leaves.
+				map.on('mouseleave', 'end', () => {
+					map.getCanvas().style.cursor = '';
+				});
 			});
 
-			map.on('click', function(e) {
+			/* map.on('click', function(e) {
 				console.log('A click event has occurred on a visible portion of the poi-label layer at ' + e.lngLat);
-			}); 
+			});  */
+			
 		});
 	};
 	navigator.geolocation.getCurrentPosition(succeed, console.log);
