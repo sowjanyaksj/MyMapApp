@@ -54,23 +54,32 @@
 
         #submit {
             position: absolute;
-            top: 90%;
+            top: 82%;
         }
 
         #goback {
             position: relative;
             top: 0%;
         }
+		.Location {
+			margin-right: 130px;
+		}
+		.OpeningTimes {
+			margin-right: 50px;
+		}
     </style>
 </head>
 
 <body>
     <button onclick="GoBack()" id="goback">GO Back</button>
     <form id="myForm">
-        <label>Location Name</label>
-        <br />
+       	<span class="Location">Location</span>
+		<span class="Category">Category</span>
+	    <br />
         <input name="location" />
+		<input name="category" />
         <br />
+		
     </form>
     <form id="myForm1">
 
@@ -80,20 +89,16 @@
         <div id="map"></div>
         <br />
     </form>
-    <form id="myForm2">
-
-        <label>Waiting Time</label>
-        <br />
-        <input name="waiting time" id="waiting time" />
-        <br />
-        <label>Opening times</label>
-        <br />
-        <input type="radio" id="opening times" name="opening times" value="9am - 5pm" /> 9am - 5pm<br />
-        <input type="radio" id="opening times" name="opening times" value="24 hours" /> 24 hours<br />
+    <form id="myForm2">		
+		<span class="OpeningTimes">Opening times</span>
+		<span class="WaitingTime">Waiting Time</span>
+        <input name="waiting_time" id="waiting_time" />       
+		<br />
+        <input type="radio" id="opening_times" name="opening_times" value="9am - 5pm" /> 9am - 5pm<br />
+        <input type="radio" id="opening_times" name="opening_times" value="24 hours" /> 24 hours<br />
         <br />
         <input name="lng" id="lng" type="hidden" />
-        <input name="lat" id="lat" type="hidden" />
-        <br />
+        <input name="lat" id="lat" type="hidden" />        
     </form>
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiMjA0MjI3MyIsImEiOiJja21zMmdsbW8wZHRkMndzMWRtNW55NWowIn0.cuMJNvU1uR_Tth7Aul-uMQ';
