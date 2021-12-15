@@ -1,10 +1,10 @@
 # Local Search & Crowdsourcing Locations
 
-The web application helps users in both ways:
+The Web application helps users in both ways:
 
-  To find directions to nearest POI(Point of Interest) contributed by Mapbox and the public
+  To find directions to nearest POI(Point of Interest) contributed by Mapbox and the Web application users
   
-  To add a new locations not existing on the Map
+  To add a new location not existing on the Map by the the Web application users
 
 # The source code can be found at https://github.com/sowjanyaksj/MyMapApp
 
