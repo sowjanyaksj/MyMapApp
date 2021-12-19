@@ -14,17 +14,35 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script>
         function SubForm() {
-            $.ajax({
-                url: "https://api.apispreadsheets.com/data/16127/",
-                type: 'post',
-                data: $("#myForm,#myForm2").serializeArray(),
-                success: function() {
-                    alert("Form Data Submitted :)")
-                },
-                error: function() {
-                    alert("There was an error :(")
-                }
-            });
+			let allAreFilled = true;
+			document.getElementById("myForm","myForm2").querySelectorAll("[required]").forEach(function(i) {
+			  if (!allAreFilled) return;
+			  if (!i.value) allAreFilled = false;
+			  if (i.type === "radio") {
+				 let radioValueCheck = false;
+				 document.getElementById("myForm").querySelectorAll(`[name=${i.name}]`).forEach(function(r) {
+					if (r.checked) radioValueCheck = true;
+				 })
+				 allAreFilled = radioValueCheck;
+			  }
+			})
+			if (!allAreFilled) {
+			  alert('Fill all the fields');
+			}
+			else {	
+				console.log(allAreFilled);
+				$.ajax({
+					url: "https://api.apispreadsheets.com/data/16127/",
+					type: 'post',
+					data: $("#myForm,#myForm2").serializeArray(),
+					success: function() {				
+						alert("Form Data Submitted :)")				   
+					},
+					error: function() {
+						alert("There was an error :(")
+					}
+				});
+			}
         }
 
         function GoBack() {
@@ -76,8 +94,8 @@
        	<span class="Location">Address</span>
 		<span class="Category">Category</span>
 	    <br />
-        <input name="location" />
-		<input name="category" />
+        <input name="location" required/>
+		<input name="category" required/>
         <br />
 		
     </form>
@@ -92,13 +110,13 @@
     <form id="myForm2">		
 		<span class="OpeningTimes">Opening times</span>
 		<span class="WaitingTime">Waiting Time</span>
-        <input name="waiting_time" id="waiting_time" />       
+        <input name="waiting_time" id="waiting_time" required/>       
 		<br />
-        <input type="radio" id="opening_times" name="opening_times" value="9am - 5pm" /> 9am - 5pm<br />
+        <input type="radio" id="opening_times" name="opening_times" value="9am - 5pm" checked/> 9am - 5pm<br />
         <input type="radio" id="opening_times" name="opening_times" value="24 hours" /> 24 hours<br />
         <br />
-        <input name="lng" id="lng" type="hidden" />
-        <input name="lat" id="lat" type="hidden" />        
+        <input name="lng" id="lng" type="hidden" required/>
+        <input name="lat" id="lat" type="hidden" required/>        
     </form>
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiMjA0MjI3MyIsImEiOiJja21zMmdsbW8wZHRkMndzMWRtNW55NWowIn0.cuMJNvU1uR_Tth7Aul-uMQ';
@@ -110,7 +128,7 @@
                 center: [position.coords.longitude, position.coords.latitude], // Starting position [lng, lat]
                 zoom: 12 // Starting zoom level
             });
-
+			
             map.on('click', function(e) {
                 console.log('A click event has occurred on a visible portion of the poi-label layer at ' + e.lngLat);
                 var elnglat = String(e.lngLat);
@@ -121,7 +139,7 @@
                 var coords = "[" + lng + "," + lat + "]";
                 document.getElementById("lng").value = lng;
                 document.getElementById("lat").value = lat;
-            })
+            });
         };
         navigator.geolocation.getCurrentPosition(succeed, console.log);
     </script>
