@@ -26,11 +26,10 @@
 				 allAreFilled = radioValueCheck;
 			  }
 			})
-			if (!allAreFilled) {
+			if (!allAreFilled || document.getElementById("lng").value=='' || document.getElementById("lat").value=='') {
 			  alert('Fill all the fields');
 			}
 			else {	
-				console.log(allAreFilled);
 				$.ajax({
 					url: "https://api.apispreadsheets.com/data/16127/",
 					type: 'post',
@@ -96,11 +95,9 @@
 	    <br />
         <input name="location" required/>
 		<input name="category" required/>
-        <br />
-		
+        <br />		
     </form>
     <form id="myForm1">
-
         <br />
         <label>Select location</label>
         <br />
