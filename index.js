@@ -270,7 +270,7 @@ let succeed = function(position) {
 			}
 
 			function getRouteDriving(end) {
-				// make a directions request using cycling profile
+				// make a directions request using Driving profile
 				// an arbitrary start will always be the same
 				// only the end or destination will change
 				var start = deviceLocation;
