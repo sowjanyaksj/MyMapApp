@@ -134,10 +134,10 @@ let succeed = function(position) {
 				var req = new XMLHttpRequest();
 				req.open('GET', url, true);
 				req.onload = function() {
-					var json = JSON.parse(req.response);
-					var data = json.routes[0];
-					var route1 = data.geometry.coordinates;
-					var geojson = {
+					var json1 = JSON.parse(req.response);
+					var data1 = json1.routes[0];
+					var route1 = data1.geometry.coordinates;
+					var geojson1 = {
 						type: 'Feature',
 						properties: {},
 						geometry: {
@@ -147,7 +147,8 @@ let succeed = function(position) {
 					};
 					// if the route1 already exists on the map, reset it using setData
 					if (map.getSource('route1')) {
-						map.getSource('route1').setData(geojson);
+						map.getSource('route1').setData(geojson1);
+						console.log('set data for route1');
 					} else { // otherwise, make a new request
 						map.addLayer({
 							id: 'route1',
@@ -159,7 +160,7 @@ let succeed = function(position) {
 									properties: {},
 									geometry: {
 										type: 'LineString',
-										coordinates: geojson
+										coordinates: geojson1
 									}
 								}
 							},
@@ -173,17 +174,21 @@ let succeed = function(position) {
 								'line-opacity': 0.75
 							}
 						});
+						map.getSource('route1').setData(geojson1);
+						console.log('added layer and data for route1');
 					}
 					// add turn instructions here at the end
 					// get the sidebar and add the instructions
-					var instructions = document.getElementById('instructions');
-					var steps = data.legs[0].steps;
-
-					var tripInstructions = [];
-					for (var i = 0; i < steps.length; i++) {
-						tripInstructions.push('<br> <li > ' + steps[i].maneuver.instruction) + ' < /li>';
+					var instructions1 = document.getElementById('instructions');
+					var steps1 = data1.legs[0].steps;
+					//console.log(steps1);
+					var tripInstructions1 = [];
+					for (var i = 0; i < steps1.length; i++) {
+						tripInstructions1.push('<br> <li > ' + steps1[i].maneuver.instruction) + ' < /li>';
 					}
-					instructions.innerHTML = '<br><span class="duration">Trip duration: ' + Math.floor(data.duration / 60) + ' min By <span style="color:green">Walking</span> </span>' + tripInstructions;
+					
+					instructions1.innerHTML = '<br><span class="duration">Trip duration: ' + Math.floor(data1.duration / 60) + ' min By <span style="color:green">Walking</span> </span>' + tripInstructions1;
+					
 				};
 				req.send();
 
@@ -201,10 +206,10 @@ let succeed = function(position) {
 				var req = new XMLHttpRequest();
 				req.open('GET', url, true);
 				req.onload = function() {
-					var json = JSON.parse(req.response);
-					var data = json.routes[0];
-					var route2 = data.geometry.coordinates;
-					var geojson = {
+					var json2 = JSON.parse(req.response);
+					var data2 = json2.routes[0];
+					var route2 = data2.geometry.coordinates;
+					var geojson2 = {
 						type: 'Feature',
 						properties: {},
 						geometry: {
@@ -214,7 +219,8 @@ let succeed = function(position) {
 					};
 					// if the route2 already exists on the map, reset it using setData
 					if (map.getSource('route2')) {
-						map.getSource('route2').setData(geojson);
+						map.getSource('route2').setData(geojson2);
+						console.log('set data for route2');
 					} else { // otherwise, make a new request
 						map.addLayer({
 							id: 'route2',
@@ -226,7 +232,7 @@ let succeed = function(position) {
 									properties: {},
 									geometry: {
 										type: 'LineString',
-										coordinates: geojson
+										coordinates: geojson2
 									}
 								}
 							},
@@ -240,21 +246,23 @@ let succeed = function(position) {
 								'line-opacity': 0.75
 							}
 						});
+						map.getSource('route2').setData(geojson2);
+						console.log('added layer and data for route2');
 					}
 					// add turn instructions here at the end
 					// get the sidebar and add the instructions
-					var instructions = document.getElementById('instructions');				
-					var steps = data.legs[0].steps;
-
-					var tripInstructions = [];
-					for (var i = 0; i < steps.length; i++) {
-						tripInstructions.push('<br> <li > ' + steps[i].maneuver.instruction) + ' < /li>';
+					var instructions2 = document.getElementById('instructions');				
+					var steps2 = data2.legs[0].steps;
+					
+					var tripInstructions2 = [];
+					for (var i = 0; i < steps2.length; i++) {
+						tripInstructions2.push('<br> <li > ' + steps2[i].maneuver.instruction) + ' < /li>';
 					}
 				   
-					var newcontent = document.createElement('div1');
-							newcontent.innerHTML = '<br><span class="duration">Trip duration: ' + Math.floor(data.duration / 60) + ' min by <span style="color:olive">Cycling</span></span>' + tripInstructions;
-					while (newcontent.firstChild) {
-						instructions.appendChild(newcontent.firstChild);
+					var newcontent2 = document.createElement('div2');
+					newcontent2.innerHTML = '<br><span class="duration">Trip duration: ' + Math.floor(data2.duration / 60) + ' min by <span style="color:olive">Cycling</span></span>' + tripInstructions2;
+					while (newcontent2.firstChild) {
+						instructions2.appendChild(newcontent2.firstChild);
 					}
 				};
 				req.send();
@@ -262,7 +270,7 @@ let succeed = function(position) {
 			}
 
 			function getRouteDriving(end) {
-				// make a directions request using Driving profile
+				// make a directions request using cycling profile
 				// an arbitrary start will always be the same
 				// only the end or destination will change
 				var start = deviceLocation;
@@ -273,23 +281,24 @@ let succeed = function(position) {
 				var req = new XMLHttpRequest();
 				req.open('GET', url, true);
 				req.onload = function() {
-					var json = JSON.parse(req.response);
-					var data = json.routes[0];
-					var route = data.geometry.coordinates;
-					var geojson = {
+					var json3 = JSON.parse(req.response);
+					var data3 = json3.routes[0];
+					var route3 = data3.geometry.coordinates;
+					var geojson3 = {
 						type: 'Feature',
 						properties: {},
 						geometry: {
 							type: 'LineString',
-							coordinates: route
+							coordinates: route3
 						}
 					};
-					// if the route already exists on the map, reset it using setData
-					if (map.getSource('route')) {
-						map.getSource('route').setData(geojson);
+					// if the route3 already exists on the map, reset it using setData
+					if (map.getSource('route3')) {
+						map.getSource('route3').setData(geojson3);
+						console.log('set data for route3');
 					} else { // otherwise, make a new request
 						map.addLayer({
-							id: 'route',
+							id: 'route3',
 							type: 'line',
 							source: {
 								type: 'geojson',
@@ -298,7 +307,7 @@ let succeed = function(position) {
 									properties: {},
 									geometry: {
 										type: 'LineString',
-										coordinates: geojson
+										coordinates: geojson3
 									}
 								}
 							},
@@ -312,21 +321,23 @@ let succeed = function(position) {
 								'line-opacity': 0.75
 							}
 						});
+						map.getSource('route3').setData(geojson3);
+						console.log('added layer and data for route3');
 					}
 					// add turn instructions here at the end
 					// get the sidebar and add the instructions
-					var instructions = document.getElementById('instructions');				
-					var steps = data.legs[0].steps;
+					var instructions3 = document.getElementById('instructions');				
+					var steps3 = data3.legs[0].steps;
 
-					var tripInstructions = [];
-					for (var i = 0; i < steps.length; i++) {
-						tripInstructions.push('<br> <li > ' + steps[i].maneuver.instruction) + ' < /li>';
+					var tripInstructions3 = [];
+					for (var i = 0; i < steps3.length; i++) {
+						tripInstructions3.push('<br> <li > ' + steps3[i].maneuver.instruction) + ' < /li>';
 					}
 								
-					var newcontent = document.createElement('div2');
-							newcontent.innerHTML = '<br><span class="duration">Trip duration: ' + Math.floor(data.duration / 60) + ' min by <span style="color:fuchsia">Driving</span></span>' + tripInstructions;
-					while (newcontent.firstChild) {
-						instructions.appendChild(newcontent.firstChild);
+					var newcontent3 = document.createElement('div3');
+					newcontent3.innerHTML = '<br><span class="duration">Trip duration: ' + Math.floor(data3.duration / 60) + ' min by <span style="color:fuchsia">Driving</span></span>' + tripInstructions3;
+					while (newcontent3.firstChild) {
+						instructions3.appendChild(newcontent3.firstChild);
 					}
 				};
 				req.send();
@@ -418,7 +429,11 @@ let succeed = function(position) {
 						});
 					}
 					getRouteWalking(coords);
-					getRouteCycling(coords);			
+					
+					//getRouteCycling(deviceLocation);
+					getRouteCycling(coords);
+					
+					//getRouteDriving(deviceLocation);					
 					getRouteDriving(coords);
 
 				});
